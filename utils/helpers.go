@@ -34,7 +34,12 @@ func CountJSONItems(JSONResponse []byte) (int, error) {
 
 	JSONObjectSlice, isOK := JSONObject.([]interface{})
 	if !isOK {
-		err = fmt.Errorf("Cannot convert the JSON object")
+		// try as map
+		JSONObjectMap, isOK2 := JSONObject.(map[string]interface{})
+		if isOK2 {
+			return len(JSONObjectMap), err
+		}
+		err = fmt.Errorf("cannot convert the JSON object")
 		// return -1 if json cannot be parsed properly
 		return -1, err
 	}
@@ -46,7 +51,6 @@ func BasicAuth(username, password string) string {
 	authString := username + ":" + password
 	return base64.StdEncoding.EncodeToString([]byte(authString))
 }
-
 
 func ErrCheck(e error) {
 	if e != nil {
