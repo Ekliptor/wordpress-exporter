@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 )
@@ -22,7 +22,12 @@ func (c *WordpressCollector) FetchJSONFromEndpoint(APIEndpoint string) []byte {
 	}
 	response, err := HTTPClient.Do(request)
 	ErrCheck(err)
-	data, _ := ioutil.ReadAll(response.Body)
+	data, _ := io.ReadAll(response.Body)
+	if err == nil && response.StatusCode != http.StatusOK {
+		fmt.Printf("Error status: %d: %s", response.StatusCode, string(data))
+		return nil
+	}
+
 	return data
 }
 
